@@ -186,6 +186,7 @@ module traffic_light_controller1(
     endcase
   end
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////
 // combination output driver  ("C2" block in the Harris & Harris Moore machine diagram)
 // Displays the colors of the lights after the combinational logic has determined the next state
   always_comb begin
