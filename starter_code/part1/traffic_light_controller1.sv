@@ -15,7 +15,7 @@ module traffic_light_controller1(
 // HRR = red-red following YRR; RRH = red-red following RRY;
 // ZRR = 2nd cycle yellow, follows YRR, etc. 
   typedef enum {GRR, YRR, ZRR, HRR, RGR, RYR, RZR, RHR, RRG, RRY, RRZ, RRH} tlc_states;  
-  tlc_states    present_state, next_state;
+  tlc_states    present_state, next_state, previous_state;
   integer ctr5, next_ctr5,       //  5 sec timeout when my traffic goes away
           ctr10, next_ctr10;     // 10 sec limit when other traffic presents
 
@@ -59,10 +59,13 @@ module traffic_light_controller1(
     GRR: begin 
          // when is next_state GRR? YRR? --> if no traffic for 1 cycle, set off counter5 then 2 yellows
           if(!ew_str_sensor) begin // there is a gap in this street
-              next_state = YRR;
-              next_ctr5  = 1;
-          end else if(ew_left_sensor) begin // there is no gap BUT there is traffice waiting on other streets
-            next_state = GRR;
+            next_state = YRR;
+            next_ctr5  = 1;
+          end else if(ew_left_sensor) begin // there is no gap BUT there is traffice waiting on E/W turn streets
+            next_state = RGR;
+            next_ctr10 = 1;
+          end else if(ns_sensor) begin // there is no gap BUT there is traffice waiting on N/S streets
+            next_state = RRG;
             next_ctr10 = 1;
           end
           else begin
@@ -83,7 +86,7 @@ module traffic_light_controller1(
       end
     HRR: begin
          // when is next_state RGR? RYR? RZR? RHR?
-         next_state = RGR; // check priority
+         next_state = RGR; // check priority using a previous_state variable
          // what does ctr5 do? ctr10?
       end
     
@@ -93,10 +96,13 @@ module traffic_light_controller1(
          if(!ew_left_sensor) begin // there is a gap in this street
               next_state = RYR;
               next_ctr5  = 1;
-         end else if(ns_sensor) begin // there is no gap BUT there is traffice waiting on other streets
+         end else if(ns_sensor) begin // there is no gap BUT there is traffice waiting on N/S  streets
             next_state = RGR;
             next_ctr10 = 1;
-         end
+         end else if(ew_str_sensor) begin // there is no gap BUT there is traffice waiting on E/W  streets
+            next_state = GRR;
+            next_ctr10 = 1;
+          end
           else begin
               next_state = RGR; // no gap in traffic NOR traffic waiting on other streets 
           end
