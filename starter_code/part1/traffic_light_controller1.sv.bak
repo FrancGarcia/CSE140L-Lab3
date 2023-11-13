@@ -158,8 +158,6 @@ module traffic_light_controller1(
     endcase
   end
 
-  
-  /////////////////////////////////////////////////////////////////////////////////////////
   always_comb begin
     next_state = HR;            // default to reset state
     case(present_state)
