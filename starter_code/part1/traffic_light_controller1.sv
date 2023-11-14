@@ -55,67 +55,74 @@ module traffic_light_controller1(
     next_ctr10 = 0;
     case(present_state)
 /* ************* Fill in the case statements ************** */
-	  // East-West Straight
+	  
+    // East-West Straight
     GRR: begin 
-         // when is next_state GRR? YRR? --> if no traffic for 1 cycle, set off counter5 then 2 yellows
+        // when is next_state GRR? YRR? --> if no traffic for 1 cycle, set off counter5 then 2 yellows
+        // what does ctr5 do? ctr10?
         if(ctr5 == 5 || ctr10 == 10) begin
-			next_state = YRR;
-        end else if(!ew_str_sensor && ctr5 == 0) begin // there is a gap in this street
+			    next_state = YRR;
+        end else if(!ew_str_sensor && ctr5 == 0) begin // there is a gap in this street --> begin ctr5
             next_state = GRR;
             next_ctr5  = ctr5 + 1;
-        end else if(ew_left_sensor && ctr10 == 0) begin // there is no gap BUT there is traffice waiting on E/W turn streets
-            next_state = GRR;
-            next_ctr10 = 1;
-        end else if(ns_sensor && ctr10 == 0) begin // there is no gap BUT there is traffice waiting on N/S streets
-            next_state = GRR;
-            next_ctr10 = 1;
-        end else if (ctr5 > 0 && ctr10 == 0) begin
-            next_state = GRR;
-            next_ctr5 = ctr5 + 1;
-        end else if(ctr10 > 0 && ctr5 == 0) begin
+        end else if(ctr10 == 0 && (ew_left_sensor || ns_sensor)) begin // there is no gap BUT there is traffice waiting on other 2 lights --> begin ctr10
             next_state = GRR;
             next_ctr10 = ctr10 + 1;
-        end else if(ctr10 > 0 && ctr5 > 0) begin
+        end 
+
+        // else if(ns_sensor && ctr10 == 0) 
+        //     next_state = GRR;                  --> covered by above conditional
+        //     next_ctr10 = ctr10 + 1;
+        // end 
+
+        else if (ctr5 > 0 && ctr10 == 0) begin  // ctr5 started --> keep incrementing it (I think this can be covered in first else if)
+            next_state = GRR;
+            next_ctr5 = ctr5 + 1;
+        end else if(ctr10 > 0 && ctr5 == 0) begin  // ctr10 started --> keep incrementing it (I think this can also be covered in second else if)
+            next_state = GRR;
+            next_ctr10 = ctr10 + 1;
+        end else if(ctr10 > 0 && ctr5 > 0) begin // if both counters started --> keep incrementing both
             next_state = GRR;
             next_ctr10 = ctr10 + 1;
             next_ctr5 = ctr5 + 1;
         end else begin
-              next_state = GRR; // no gap in traffic NOR traffic waiting on other streets
+              next_state = GRR; // no gap in traffic NOR traffic waiting on other streets --> keep giving green light
         end
-
-         
-         // what does ctr5 do? ctr10?
       end 
     YRR: begin
-         // when is next_state YRR? ZRR? HRR?
          next_state = ZRR;
-         // what does ctr5 do? ctr10?
       end
     ZRR: begin
-         // when is next_state YRR? ZRR? HRR?
          next_state = HRR;
-         // what does ctr5 do? ctr10?
       end
     HRR: begin
-         // when is next_state RGR? RYR? RZR? RHR?
-         next_state = RGR; // check priority using a previous_state variable
-         // what does ctr5 do? ctr10?
+         // PRIORITY: EWL > NS > EWS
+         if(ew_left_sensor) begin
+            next_state = RGR;
+         end else if(ns_sensor && !ew_str_sensor) begin
+            next_state = RRG;
+         end else if(!ns_sensor && ew_str_sensor) begin
+            next_state = GRR;
+         end else begin
+            next_state = HRR; // Stay put --> all three sensors are off
+         end
       end
     
     // East-West Left turn
     RGR: begin
-         // when is next_state RGR? RYR? RZR? RHR?
-         if(ctr5 == 5 || ctr10 == 10) begin
-			next_state = RYR;
+        // when is next_state RGR? RYR? RZR? RHR?
+        // what does ctr5 do? ctr10?
+        if(ctr5 == 5 || ctr10 == 10) begin
+			    next_state = RYR;
         end else if(!ew_left_sensor && ctr5 == 0) begin // there is a gap in this street
             next_state = RGR;
             next_ctr5  = ctr5 + 1;
         end else if(ew_str_sensor && ctr10 == 0) begin // there is no gap BUT there is traffice waiting on E/W turn streets
             next_state = RGR;
-            next_ctr10 = 1;
+            next_ctr10 = ctr10 + 1;
         end else if(ns_sensor && ctr10 == 0) begin // there is no gap BUT there is traffice waiting on N/S streets
             next_state = RGR;
-            next_ctr10 = 1;
+            next_ctr10 = ctr10 + 1;
         end else if (ctr5 > 0 && ctr10 == 0) begin
             next_state = RGR;
             next_ctr5 = ctr5 + 1;
@@ -129,38 +136,41 @@ module traffic_light_controller1(
         end else begin
               next_state = RGR; // no gap in traffic NOR traffic waiting on other streets
         end
-         // what does ctr5 do? ctr10?
       end
     RYR: begin
-         // when is next_state RGR? RYR? RZR? RHR?
          next_state = RZR;
-         // what does ctr5 do? ctr10?
       end
     RZR: begin
-         // when is next_state RGR? RYR? RZR? RHR?
         next_state = RHR;
-         // what does ctr5 do? ctr10?
       end
     RHR: begin
-         // when is next_state RGR? RYR? RZR? RHR?
-         next_state = RRG; // check priority
-         // what does ctr5 do? ctr10?
+         // PRIORITY: NS > EWS > EWL
+         if(ns_sensor) begin
+            next_state = RRG;
+         end else if(ew_str_sensor && !ew_left_sensor) begin
+            next_state = GRR;
+         end else if(!ew_str_sensor && ew_left_sensor) begin
+            next_state = RGR;
+         end else begin
+            next_state = RHR; // Stay put --> all three sensors are off
+         end
       end
     
     // North South (only has straight)
     RRG: begin
-         // when is next_state RRG? RRY? RRZ? RRH?
-         if(ctr5 == 5 || ctr10 == 10) begin
-			next_state = RRY;
+        // when is next_state RRG? RRY? RRZ? RRH?
+        // what does ctr5 do? ctr10?
+        if(ctr5 == 5 || ctr10 == 10) begin
+		      next_state = RRY;
         end else if(!ns_sensor && ctr5 == 0) begin // there is a gap in this street
             next_state = RRG;
             next_ctr5  = ctr5 + 1;
         end else if(ew_left_sensor && ctr10 == 0) begin // there is no gap BUT there is traffice waiting on E/W turn streets
             next_state = RRG;
-            next_ctr10 = 1;
+            next_ctr10 = ctr10 + 1;
         end else if(ew_str_sensor && ctr10 == 0) begin // there is no gap BUT there is traffice waiting on N/S streets
             next_state = RRG;
-            next_ctr10 = 1;
+            next_ctr10 = ctr10 + 1;
         end else if (ctr5 > 0 && ctr10 == 0) begin
             next_state = RRG;
             next_ctr5 = ctr5 + 1;
@@ -174,56 +184,35 @@ module traffic_light_controller1(
         end else begin
               next_state = RRG; // no gap in traffic NOR traffic waiting on other streets
         end
-         // what does ctr5 do? ctr10?
       end
     RRY: begin
-         // when is next_state RRG? RRY? RRZ? RRH?
          next_state = RRZ;
-         // what does ctr5 do? ctr10?
       end
     RRZ: begin
-         // when is next_state RRG? RRY? RRZ? RRH?
          next_state = RRH;
-         // what does ctr5 do? ctr10?
       end
     RRH: begin
-         // when is next_state RRG? RRY? RRZ? RRH?
-         next_state = GRR; // check priority
-         // what does ctr5 do? ctr10?
+         // PRIORITY: EWS > EWL > NS 
+         if(ew_str_sensor) begin
+            next_state = GRR;
+         end else if(ew_left_sensor && !ns_sensor) begin
+            next_state = RGR;
+         end else if(!ew_str_sensor && ns_sensor) begin
+            next_state = RRG;
+         end else begin
+            next_state = RRH; // Stay put --> all three sensors are off
+         end
       end
-     // etc. 
     endcase
   end
+
 
   
-  /////////////////////////////////////////////////////////////////////////////////////////
-  always_comb begin
-    next_state = HR;            // default to reset state
-    case(present_state)
-// if green for street A, stay green if traffic, go to yellow if not
-	GR:  if(!Ta)     next_state = YR;
-	     else        next_state = GR;
-// yellow for A street lasts one clock cycle, then on to all red 1
-	YR:  next_state = HR;	   // all_red_1	  ZR
-//  ZR:  next_state = HR;
-// first all-red state; give precedence to other street for green
-	HR:  if(Tb)      next_state = RG;    
-    	 else if(Ta) next_state = GR;
-		 else        next_state = HR;
-// green in the other direction looks only at Tb (traffic on its own street)
-	RG:  if(!Tb)     next_state = RY;
-	     else        next_state = RG;
-// yellow for B street goes to all red 2 
-	RY:  next_state = RH;
-//	RZ:
-// second all-red state -- not "fairness" reversal of priorities
-	RH:  if(Ta)       next_state = GR;
-	     else if(Tb)  next_state = RG;
-		 else         next_state = RH;
-    endcase
-  end
 
-  //////////////////////////////////////////////////////////////////////////////////////////////////
+// NOTE: Harris & Harris example is on the very bottom for convenience
+
+
+
 // combination output driver  ("C2" block in the Harris & Harris Moore machine diagram)
 // Displays the colors of the lights after the combinational logic has determined the next state
   always_comb begin
@@ -241,3 +230,39 @@ module traffic_light_controller1(
   end
 
 endmodule
+
+
+
+
+
+
+
+
+//   ///////////////////////////////////// HARRIS & HARRIS /////////////////////////////////////////////
+//   always_comb begin
+//     next_state = HR;            // default to reset state
+//     case(present_state)
+// // if green for street A, stay green if traffic, go to yellow if not
+// 	GR:  if(!Ta)     next_state = YR;
+// 	     else        next_state = GR;
+// // yellow for A street lasts one clock cycle, then on to all red 1
+// 	YR:  next_state = HR;	   // all_red_1	  ZR
+// //  ZR:  next_state = HR;
+// // first all-red state; give precedence to other street for green
+// 	HR:  if(Tb)      next_state = RG;    
+//     	 else if(Ta) next_state = GR;
+// 		 else        next_state = HR;
+// // green in the other direction looks only at Tb (traffic on its own street)
+// 	RG:  if(!Tb)     next_state = RY;
+// 	     else        next_state = RG;
+// // yellow for B street goes to all red 2 
+// 	RY:  next_state = RH;
+// //	RZ:
+// // second all-red state -- not "fairness" reversal of priorities
+// 	RH:  if(Ta)       next_state = GR;
+// 	     else if(Tb)  next_state = RG;
+// 		 else         next_state = RH;
+//     endcase
+//   end
+
+//   ///////////////////////////////////////////////////////////////////////////////////////////////////
