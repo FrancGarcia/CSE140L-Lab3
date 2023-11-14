@@ -105,19 +105,30 @@ module traffic_light_controller1(
     // East-West Left turn
     RGR: begin
          // when is next_state RGR? RYR? RZR? RHR?
-         if(!ew_left_sensor) begin // there is a gap in this street
-              next_state = RYR;
-              next_ctr5  = 1;
-         end else if(ns_sensor) begin // there is no gap BUT there is traffice waiting on N/S  streets
+         if(ctr5 == 5 || ctr10 == 10) begin
+			next_state = RYR;
+        end else if(!ew_left_sensor && ctr5 == 0) begin // there is a gap in this street
+            next_state = RGR;
+            next_ctr5  = ctr5 + 1;
+        end else if(ew_str_sensor && ctr10 == 0) begin // there is no gap BUT there is traffice waiting on E/W turn streets
             next_state = RGR;
             next_ctr10 = 1;
-         end else if(ew_str_sensor) begin // there is no gap BUT there is traffice waiting on E/W  streets
-            next_state = GRR;
+        end else if(ns_sensor && ctr10 == 0) begin // there is no gap BUT there is traffice waiting on N/S streets
+            next_state = RGR;
             next_ctr10 = 1;
-          end
-          else begin
-              next_state = RGR; // no gap in traffic NOR traffic waiting on other streets 
-          end
+        end else if (ctr5 > 0 && ctr10 == 0) begin
+            next_state = RGR;
+            next_ctr5 = ctr5 + 1;
+        end else if(ctr10 > 0 && ctr5 == 0) begin
+            next_state = RGR;
+            next_ctr10 = ctr10 + 1;
+        end else if(ctr10 > 0 && ctr5 > 0) begin
+            next_state = RGR;
+            next_ctr10 = ctr10 + 1;
+            next_ctr5 = ctr5 + 1;
+        end else begin
+              next_state = RGR; // no gap in traffic NOR traffic waiting on other streets
+        end
          // what does ctr5 do? ctr10?
       end
     RYR: begin
@@ -139,16 +150,30 @@ module traffic_light_controller1(
     // North South (only has straight)
     RRG: begin
          // when is next_state RRG? RRY? RRZ? RRH?
-         if(!ns_sensor) begin
-              next_state = RRY;
-              next_ctr5  = 1; 
-         end else if(ew_str_sensor) begin
+         if(ctr5 == 5 || ctr10 == 10) begin
+			next_state = RRY;
+        end else if(!ns_sensor && ctr5 == 0) begin // there is a gap in this street
+            next_state = RRG;
+            next_ctr5  = ctr5 + 1;
+        end else if(ew_left_sensor && ctr10 == 0) begin // there is no gap BUT there is traffice waiting on E/W turn streets
             next_state = RRG;
             next_ctr10 = 1;
-         end
-          else begin
-              next_state = RRG;
-          end
+        end else if(ew_str_sensor && ctr10 == 0) begin // there is no gap BUT there is traffice waiting on N/S streets
+            next_state = RRG;
+            next_ctr10 = 1;
+        end else if (ctr5 > 0 && ctr10 == 0) begin
+            next_state = RRG;
+            next_ctr5 = ctr5 + 1;
+        end else if(ctr10 > 0 && ctr5 == 0) begin
+            next_state = RRG;
+            next_ctr10 = ctr10 + 1;
+        end else if(ctr10 > 0 && ctr5 > 0) begin
+            next_state = RRG;
+            next_ctr10 = ctr10 + 1;
+            next_ctr5 = ctr5 + 1;
+        end else begin
+              next_state = RRG; // no gap in traffic NOR traffic waiting on other streets
+        end
          // what does ctr5 do? ctr10?
       end
     RRY: begin
