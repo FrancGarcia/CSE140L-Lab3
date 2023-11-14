@@ -58,24 +58,30 @@ module traffic_light_controller1(
 	  // East-West Straight
     GRR: begin 
          // when is next_state GRR? YRR? --> if no traffic for 1 cycle, set off counter5 then 2 yellows
-          if(ctr5 == 5 || ctr10 == 10) begin
-				next_state = YRR;
-			 end else if (ctr5 > 0) begin
-				next_ctr5 = ctr5 + 1;
-			 end
-			 if(!ew_str_sensor) begin // there is a gap in this street
+        if(ctr5 == 5 || ctr10 == 10) begin
+			next_state = YRR;
+        end else if(!ew_str_sensor) begin // there is a gap in this street
             next_state = YRR;
             next_ctr5  = ctr5 + 1;
-          end else if(ew_left_sensor) begin // there is no gap BUT there is traffice waiting on E/W turn streets
+        end else if(ew_left_sensor) begin // there is no gap BUT there is traffice waiting on E/W turn streets
             next_state = RGR;
             next_ctr10 = 1;
-          end else if(ns_sensor) begin // there is no gap BUT there is traffice waiting on N/S streets
+        end else if(ns_sensor) begin // there is no gap BUT there is traffice waiting on N/S streets
             next_state = RRG;
             next_ctr10 = 1;
-          end
-          else begin
+        end else begin
               next_state = GRR; // no gap in traffic NOR traffic waiting on other streets
-          end
+        end
+
+        if (ctr5 > 0) begin
+            next_state = GRR;
+			next_ctr5 = ctr5 + 1;
+        end
+
+        if (ctr10 > 0) begin
+            next_state = GRR;
+            next_ctr10 = ctr10 + 1;
+        end
          
          // what does ctr5 do? ctr10?
       end 
