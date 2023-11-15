@@ -58,24 +58,130 @@ module traffic_light_controller(
 	next_ctr10 = 0;
 	case(present_state)
 /* ************* Fill in the case statements ************** */
-	  GRRRR: begin /* fill in the guts
+		// EWS light
+		GRRRR: begin /* fill in the guts
 			   build on part 1
 			   round-robin priority for four other direcions
                 */
-	         end      
-	  RGRRR: begin 		                                 // EL+ES green
+	        end      
+		YRRRR: next_state = ZRRRR;  // 2nd yellow
+		ZRRRR: next_state = HRRRR;  // all red lights
+		HRRRR: begin
+			// priority --> EL_ES > WL_WS > EWL > NS > EWS 
+			// finish priority doctrine
+			if() begin
+				next_state = RGRRR;  
+			end else if() begin
+				next_state = RRGRR;  
+			end else if() begin
+				next_state = RRRGR;  
+			end else if() begin
+				next_state = RRRRG;  
+			end else if() begin
+				next_state = GRRRR;  
+			end else begin
+				next_state = HRRRR; // stay put
+			end      
+		end
+
+		// ES_EL light
+		RGRRR: begin 		                                 // EL+ES green
               // ** fill in the guts **
 	         end
-	  RYRRR: next_state = RZRRR;
-	  RZRRR: next_state = RHRRR;
-	  RHRRR: begin
-             // ** fill in the guts **
-      end
+		RYRRR: next_state = RZRRR;
+		RZRRR: next_state = RHRRR;
+		RHRRR: begin
+			// WL_WS > EWL > NS > EWS > EL_ES
+            // finish priority doctrine
+			if() begin
+				next_state = RRGRR;  
+			end else if() begin
+				next_state = RRRGR;  
+			end else if() begin
+				next_state = RRRRG;  
+			end else if() begin
+				next_state = GRRRR;  
+			end else if() begin
+				next_state = RGRRR;  
+			end else begin
+				next_state = HRRRR; // stay put
+			end 
+    	end
 
-	  RRGRR: begin 
+		// WS_WL light
+	  	RRGRR: begin 
 	        // ** fill in the guts, etc **
-	  end
+	 	end
+		RRYRR: next_state = RRZRR;
+		RRZRR: next_state = RRHRR;
+		RRHRR: begin
+			// EWL > NS > EWS > EL_ES > WL_WS
+			// finish priority doctrine
+			if() begin
+				next_state = RRRGR;  
+			end else if() begin
+				next_state = RRRRG;  
+			end else if() begin
+				next_state = GRRRR;  
+			end else if() begin
+				next_state = RGRRR;  
+			end else if() begin
+				next_state = RRGRR;  
+			end else begin
+				next_state = HRRRR; // stay put
+			end 
+		end
+
+		// EWL light
+		RRRGR: begin
+			// ** fill in the guts, etc **
+		end
+		RRRYR: next_state = RRRZR;
+		RRRZR: next_state = RRRHR;
+		RRRHR: begin
+			// NS > EWS > EL_ES > WL_WS > EWL
+			// finish priority doctrine
+			if() begin
+				next_state = RRRRG;  
+			end else if() begin
+				next_state = GRRRR;  
+			end else if() begin
+				next_state = RGRRR;  
+			end else if() begin
+				next_state = RRGRR;  
+			end else if() begin
+				next_state = RRRGR;  
+			end else begin
+				next_state = HRRRR; // stay put
+			end 
+		end
+
+		// NS light
+		RRRRG: begin
+			// ** fill in the guts, etc **
+		end
+		RRRRY: next_state = RRRRZ;
+		RRRRZ: next_state = RRRRH;
+		RRRRH: begin
+			// EWS > EL_ES > WL_WS > EWL > NS 
+			// finish priority doctrine
+			if() begin
+				next_state = GRRRR;  
+			end else if() begin
+				next_state = RGRRR;  
+			end else if() begin
+				next_state = RRGRR;  
+			end else if() begin
+				next_state = RRRGR;  
+			end else if() begin
+				next_state = RRRRG;  
+			end else begin
+				next_state = HRRRR; // stay put
+			end 
+		end
+
       // ** fill in the guts to complete 5 sets of R Y Z H progressions **
+	endcase
   end
 
 // combination output driver  ("C2" block in the Harris & Harris Moore machine diagram)
@@ -86,10 +192,46 @@ module traffic_light_controller(
 	  w_left_light = red;
 	  ns_light     = red;
 	  case(present_state)      // Moore machine
-		GRRRR:   begin e_str_light = green;
-					   w_str_light = green;
+	  // ** fill in the guts for all 5 directions -- just the greens and yellows ** --> DONE
+		GRRRR: begin
+			e_str_light = green;
+			w_str_light = green;
 		end
-      // ** fill in the guts for all 5 directions -- just the greens and yellows **
+		YRRRR,ZRRRR: begin
+			e_str_light = yelllow;
+			w_str_light = yellow;
+		end
+		RGRRR: begin
+			e_str_light = green;
+			e_left_light = green;
+		end
+		RYRRR,RZRRR: begin
+			e_str_light = yellow;
+			e_left_light = yellow;
+		end
+		RRGRR: begin
+			w_str_light = green;
+			w_left_light = green;
+		end
+		RRYRR,RRZRR: begin
+			w_str_light = yellow;
+			w_left_light = yellow;
+		end
+		RRRGR: begin
+			e_left_light = green;
+			w_left_light = green;
+		end
+		RRRYR,RRRZR: begin
+			e_left_light = yellow;
+			w_left_light = yellow;
+		end
+		RRRRG: begin
+			ns_light = green;
+		end
+		RRRRY,RRRRZ: begin
+			ns_light = yellow;
+		end
+	  endcase
 	end
 
 endmodule

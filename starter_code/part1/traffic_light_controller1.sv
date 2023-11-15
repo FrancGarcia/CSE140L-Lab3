@@ -32,18 +32,6 @@ module traffic_light_controller1(
       ctr5          <= next_ctr5;
       ctr10         <= next_ctr10;
     end  
-
-
-  // State table:
-	// State | EW straight  |  EW left arrow | NS (straight or unprotected left)
-	// 000        Red				      Red                       Red				(No traffic red)
-	// 001        Green           Red                       Red
-	// 010 		    Yellow			    Red							          Red
-	// 011 		    Red				      Green							        Red
-	// 100 		    Red             Yellow						        Red
-	// 101 		    Red					    Red							          Green
-	// 110		    Red					    Red							          Yellow
-	// 111		    Red					    Red							          Red				(Transition red)
 	
 	// Fair decision doctrine: EWS > EWL > NS 
 
