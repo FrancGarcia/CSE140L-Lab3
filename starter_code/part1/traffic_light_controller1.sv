@@ -60,24 +60,17 @@ module traffic_light_controller1(
     GRR: begin 
         // when is next_state GRR? YRR? --> if no traffic for 1 cycle, set off counter5 then 2 yellows
         // what does ctr5 do? ctr10?
-        if(ctr5 == 5 || ctr10 == 10) begin
+        if(ctr5 == 4 || ctr10 == 9) begin
 			    next_state = YRR;
-        end else if(!ew_str_sensor && ctr5 == 0) begin // there is a gap in this street --> begin ctr5
+        end else if(!ew_str_sensor && ctr5 == 0 && ctr10 < 5) begin // there is a gap in this street --> begin ctr5
             next_state = GRR;
             next_ctr5  = ctr5 + 1;
+        end else if (ctr5 > 0 && ctr10 == 0) begin  // ctr5 started --> keep incrementing it (I think this can be covered in first else if)
+            next_state = GRR;
+            next_ctr5 = ctr5 + 1;
         end else if(ctr10 == 0 && (ew_left_sensor || ns_sensor)) begin // there is no gap BUT there is traffice waiting on other 2 lights --> begin ctr10
             next_state = GRR;
             next_ctr10 = ctr10 + 1;
-        end 
-
-        // else if(ns_sensor && ctr10 == 0) 
-        //     next_state = GRR;                  --> covered by above conditional
-        //     next_ctr10 = ctr10 + 1;
-        // end 
-
-        else if (ctr5 > 0 && ctr10 == 0) begin  // ctr5 started --> keep incrementing it (I think this can be covered in first else if)
-            next_state = GRR;
-            next_ctr5 = ctr5 + 1;
         end else if(ctr10 > 0 && ctr5 == 0) begin  // ctr10 started --> keep incrementing it (I think this can also be covered in second else if)
             next_state = GRR;
             next_ctr10 = ctr10 + 1;
@@ -99,9 +92,9 @@ module traffic_light_controller1(
          // PRIORITY: EWL > NS > EWS
          if(ew_left_sensor) begin
             next_state = RGR;
-         end else if(ns_sensor && !ew_str_sensor) begin
+         end else if(ns_sensor) begin
             next_state = RRG;
-         end else if(!ns_sensor && ew_str_sensor) begin
+         end else if(ew_str_sensor) begin
             next_state = GRR;
          end else begin
             next_state = HRR; // Stay put --> all three sensors are off
@@ -112,20 +105,20 @@ module traffic_light_controller1(
     RGR: begin
         // when is next_state RGR? RYR? RZR? RHR?
         // what does ctr5 do? ctr10?
-        if(ctr5 == 5 || ctr10 == 10) begin
+        if(ctr5 == 4 || ctr10 == 9) begin
 			    next_state = RYR;
-        end else if(!ew_left_sensor && ctr5 == 0) begin // there is a gap in this street
+        end else if(!ew_left_sensor && ctr5 == 0 && ctr10 < 5) begin // there is a gap in this street
             next_state = RGR;
             next_ctr5  = ctr5 + 1;
+        end else if (ctr5 > 0 && ctr10 == 0) begin
+            next_state = RGR;
+            next_ctr5 = ctr5 + 1;
         end else if(ew_str_sensor && ctr10 == 0) begin // there is no gap BUT there is traffice waiting on E/W turn streets
             next_state = RGR;
             next_ctr10 = ctr10 + 1;
         end else if(ns_sensor && ctr10 == 0) begin // there is no gap BUT there is traffice waiting on N/S streets
             next_state = RGR;
             next_ctr10 = ctr10 + 1;
-        end else if (ctr5 > 0 && ctr10 == 0) begin
-            next_state = RGR;
-            next_ctr5 = ctr5 + 1;
         end else if(ctr10 > 0 && ctr5 == 0) begin
             next_state = RGR;
             next_ctr10 = ctr10 + 1;
@@ -147,9 +140,9 @@ module traffic_light_controller1(
          // PRIORITY: NS > EWS > EWL
          if(ns_sensor) begin
             next_state = RRG;
-         end else if(ew_str_sensor && !ew_left_sensor) begin
+         end else if(ew_str_sensor) begin
             next_state = GRR;
-         end else if(!ew_str_sensor && ew_left_sensor) begin
+         end else if(ew_left_sensor) begin
             next_state = RGR;
          end else begin
             next_state = RHR; // Stay put --> all three sensors are off
@@ -160,20 +153,20 @@ module traffic_light_controller1(
     RRG: begin
         // when is next_state RRG? RRY? RRZ? RRH?
         // what does ctr5 do? ctr10?
-        if(ctr5 == 5 || ctr10 == 10) begin
+        if(ctr5 == 4 || ctr10 == 9) begin
 		      next_state = RRY;
-        end else if(!ns_sensor && ctr5 == 0) begin // there is a gap in this street
+        end else if(!ns_sensor && ctr5 == 0 && ctr10 < 5) begin // there is a gap in this street
             next_state = RRG;
             next_ctr5  = ctr5 + 1;
+        end else if (ctr5 > 0 && ctr10 == 0) begin
+            next_state = RRG;
+            next_ctr5 = ctr5 + 1;
         end else if(ew_left_sensor && ctr10 == 0) begin // there is no gap BUT there is traffice waiting on E/W turn streets
             next_state = RRG;
             next_ctr10 = ctr10 + 1;
         end else if(ew_str_sensor && ctr10 == 0) begin // there is no gap BUT there is traffice waiting on N/S streets
             next_state = RRG;
             next_ctr10 = ctr10 + 1;
-        end else if (ctr5 > 0 && ctr10 == 0) begin
-            next_state = RRG;
-            next_ctr5 = ctr5 + 1;
         end else if(ctr10 > 0 && ctr5 == 0) begin
             next_state = RRG;
             next_ctr10 = ctr10 + 1;
@@ -195,9 +188,9 @@ module traffic_light_controller1(
          // PRIORITY: EWS > EWL > NS 
          if(ew_str_sensor) begin
             next_state = GRR;
-         end else if(ew_left_sensor && !ns_sensor) begin
+         end else if(ew_left_sensor) begin
             next_state = RGR;
-         end else if(!ew_str_sensor && ns_sensor) begin
+         end else if(ns_sensor) begin
             next_state = RRG;
          end else begin
             next_state = RRH; // Stay put --> all three sensors are off
