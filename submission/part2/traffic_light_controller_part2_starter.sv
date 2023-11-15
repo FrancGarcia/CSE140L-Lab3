@@ -312,7 +312,7 @@ module traffic_light_controller(
 			w_str_light = green;
 		end
 		YRRRR,ZRRRR: begin
-			e_str_light = yellow;
+			e_str_light = yelllow;
 			w_str_light = yellow;
 		end
 		RGRRR: begin
