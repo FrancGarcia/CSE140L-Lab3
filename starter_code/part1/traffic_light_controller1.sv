@@ -50,9 +50,10 @@ module traffic_light_controller1(
         // what does ctr5 do? ctr10?
         if(ctr5 == 4 || ctr10 == 9) begin
 			    next_state = YRR;
-        end else if(!ew_str_sensor && ctr5 == 0 && ctr10 < 5) begin // there is a gap in this street --> begin ctr5
+        end else if(!ew_str_sensor && ctr5 == 0) begin // there is a gap in this street --> begin ctr5
             next_state = GRR;
             next_ctr5  = ctr5 + 1;
+            next_ctr10 = ctr10 + 1;
         end else if (ctr5 > 0 && ctr10 == 0) begin  // ctr5 started --> keep incrementing it (I think this can be covered in first else if)
             next_state = GRR;
             next_ctr5 = ctr5 + 1;

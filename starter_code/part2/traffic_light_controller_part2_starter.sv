@@ -63,21 +63,43 @@ module traffic_light_controller(
 			   build on part 1
 			   round-robin priority for four other direcions
                 */
-	        end      
+			if(ctr5 == 4 || ctr10 == 9) begin
+			    next_state = YRRRR;
+        	end else if(!s && ctr5 == 0) begin // there is a gap in this street --> begin ctr5
+            	next_state = GRRRR;
+            	next_ctr5  = ctr5 + 1;
+				next_ctr10 = ctr10 + 1;
+        	end else if (ctr5 > 0 && ctr10 == 0) begin  // ctr5 started --> keep incrementing it
+				next_state = GRRRR;
+				next_ctr5 = ctr5 + 1;
+			end else if(ctr10 == 0 && sb) begin // there is no gap BUT there is traffice waiting on other lights --> begin ctr10
+				next_state = GRRRR;
+				next_ctr10 = ctr10 + 1;
+			end else if(ctr10 > 0 && ctr5 == 0) begin  // ctr10 started --> keep incrementing it 
+				next_state = GRRRR;
+				next_ctr10 = ctr10 + 1;
+			end else if(ctr10 > 0 && ctr5 > 0) begin // if both counters started --> keep incrementing both
+				next_state = GRRRR;
+				next_ctr10 = ctr10 + 1;
+				next_ctr5 = ctr5 + 1;
+			end else begin
+				next_state = GRRRR; // no gap in traffic NOR traffic waiting on other lights --> keep giving green light
+			end
+	    end      
 		YRRRR: next_state = ZRRRR;  // 2nd yellow
 		ZRRRR: next_state = HRRRR;  // all red lights
 		HRRRR: begin
 			// priority --> EL_ES > WL_WS > EWL > NS > EWS 
 			// finish priority doctrine
-			if() begin
+			if(e) begin
 				next_state = RGRRR;  
-			end else if() begin
+			end else if(w) begin
 				next_state = RRGRR;  
-			end else if() begin
+			end else if(l) begin
 				next_state = RRRGR;  
-			end else if() begin
+			end else if(n) begin
 				next_state = RRRRG;  
-			end else if() begin
+			end else if(s) begin
 				next_state = GRRRR;  
 			end else begin
 				next_state = HRRRR; // stay put
@@ -87,96 +109,188 @@ module traffic_light_controller(
 		// ES_EL light
 		RGRRR: begin 		                                 // EL+ES green
               // ** fill in the guts **
-	         end
+			if(ctr5 == 4 || ctr10 == 9) begin
+			    next_state = RYRRR;
+        	end else if(!e && ctr5 == 0) begin // there is a gap in this street --> begin ctr5
+            	next_state = RGRRR;
+            	next_ctr5  = ctr5 + 1;
+				next_ctr10 = ctr10 + 1;
+        	end else if (ctr5 > 0 && ctr10 == 0) begin  // ctr5 started --> keep incrementing it
+				next_state = RGRRR;
+				next_ctr5 = ctr5 + 1;
+			end else if(ctr10 == 0 && eb) begin // there is no gap BUT there is traffice waiting on other lights --> begin ctr10
+				next_state = RGRRR;
+				next_ctr10 = ctr10 + 1;
+			end else if(ctr10 > 0 && ctr5 == 0) begin  // ctr10 started --> keep incrementing it 
+				next_state = RGRRR;
+				next_ctr10 = ctr10 + 1;
+			end else if(ctr10 > 0 && ctr5 > 0) begin // if both counters started --> keep incrementing both
+				next_state = RGRRR;
+				next_ctr10 = ctr10 + 1;
+				next_ctr5 = ctr5 + 1;
+			end else begin
+				next_state = RGRRR; // no gap in traffic NOR traffic waiting on other lights --> keep giving green light
+			end
+	    end
 		RYRRR: next_state = RZRRR;
 		RZRRR: next_state = RHRRR;
 		RHRRR: begin
 			// WL_WS > EWL > NS > EWS > EL_ES
             // finish priority doctrine
-			if() begin
+			if(w) begin
 				next_state = RRGRR;  
-			end else if() begin
+			end else if(l) begin
 				next_state = RRRGR;  
-			end else if() begin
+			end else if(n) begin
 				next_state = RRRRG;  
-			end else if() begin
+			end else if(s) begin
 				next_state = GRRRR;  
-			end else if() begin
+			end else if(e) begin
 				next_state = RGRRR;  
 			end else begin
-				next_state = HRRRR; // stay put
+				next_state = RHRRR; // stay put
 			end 
     	end
 
 		// WS_WL light
 	  	RRGRR: begin 
 	        // ** fill in the guts, etc **
+			if(ctr5 == 4 || ctr10 == 9) begin
+			    next_state = RRYRR;
+        	end else if(!w && ctr5 == 0) begin // there is a gap in this street --> begin ctr5
+            	next_state = RRGRR;
+            	next_ctr5  = ctr5 + 1;
+				next_ctr10 = ctr10 + 1;
+        	end else if (ctr5 > 0 && ctr10 == 0) begin  // ctr5 started --> keep incrementing it
+				next_state = RRGRR;
+				next_ctr5 = ctr5 + 1;
+			end else if(ctr10 == 0 && wb) begin // there is no gap BUT there is traffice waiting on other lights --> begin ctr10
+				next_state = RRGRR;
+				next_ctr10 = ctr10 + 1;
+			end else if(ctr10 > 0 && ctr5 == 0) begin  // ctr10 started --> keep incrementing it 
+				next_state = RRGRR;
+				next_ctr10 = ctr10 + 1;
+			end else if(ctr10 > 0 && ctr5 > 0) begin // if both counters started --> keep incrementing both
+				next_state = RRGRR;
+				next_ctr10 = ctr10 + 1;
+				next_ctr5 = ctr5 + 1;
+			end else begin
+				next_state = RRGRR; // no gap in traffic NOR traffic waiting on other lights --> keep giving green light
+			end
+
+
 	 	end
 		RRYRR: next_state = RRZRR;
 		RRZRR: next_state = RRHRR;
 		RRHRR: begin
 			// EWL > NS > EWS > EL_ES > WL_WS
 			// finish priority doctrine
-			if() begin
+			if(l) begin
 				next_state = RRRGR;  
-			end else if() begin
+			end else if(n) begin
 				next_state = RRRRG;  
-			end else if() begin
+			end else if(s) begin
 				next_state = GRRRR;  
-			end else if() begin
+			end else if(e) begin
 				next_state = RGRRR;  
-			end else if() begin
+			end else if(w) begin
 				next_state = RRGRR;  
 			end else begin
-				next_state = HRRRR; // stay put
+				next_state = RRHRR; // stay put
 			end 
 		end
 
 		// EWL light
 		RRRGR: begin
 			// ** fill in the guts, etc **
+			if(ctr5 == 4 || ctr10 == 9) begin
+			    next_state = RRRYR;
+        	end else if(!l && ctr5 == 0) begin // there is a gap in this street --> begin ctr5
+            	next_state = RRRGR;
+            	next_ctr5  = ctr5 + 1;
+				next_ctr10 = ctr10 + 1;
+        	end else if (ctr5 > 0 && ctr10 == 0) begin  // ctr5 started --> keep incrementing it
+				next_state = RRRGR;
+				next_ctr5 = ctr5 + 1;
+			end else if(ctr10 == 0 && lb) begin // there is no gap BUT there is traffice waiting on other lights --> begin ctr10
+				next_state = RRRGR;
+				next_ctr10 = ctr10 + 1;
+			end else if(ctr10 > 0 && ctr5 == 0) begin  // ctr10 started --> keep incrementing it 
+				next_state = RRRGR;
+				next_ctr10 = ctr10 + 1;
+			end else if(ctr10 > 0 && ctr5 > 0) begin // if both counters started --> keep incrementing both
+				next_state = RRRGR;
+				next_ctr10 = ctr10 + 1;
+				next_ctr5 = ctr5 + 1;
+			end else begin
+				next_state = RRRGR; // no gap in traffic NOR traffic waiting on other lights --> keep giving green light
+			end
+
+			
 		end
 		RRRYR: next_state = RRRZR;
 		RRRZR: next_state = RRRHR;
 		RRRHR: begin
 			// NS > EWS > EL_ES > WL_WS > EWL
 			// finish priority doctrine
-			if() begin
+			if(n) begin
 				next_state = RRRRG;  
-			end else if() begin
+			end else if(s) begin
 				next_state = GRRRR;  
-			end else if() begin
+			end else if(e) begin
 				next_state = RGRRR;  
-			end else if() begin
+			end else if(w) begin
 				next_state = RRGRR;  
-			end else if() begin
+			end else if(l) begin
 				next_state = RRRGR;  
 			end else begin
-				next_state = HRRRR; // stay put
+				next_state = RRRHR; // stay put
 			end 
 		end
 
 		// NS light
 		RRRRG: begin
 			// ** fill in the guts, etc **
+			if(ctr5 == 4 || ctr10 == 9) begin
+			    next_state = RRRRY;
+        	end else if(!n && ctr5 == 0) begin // there is a gap in this street --> begin ctr5
+            	next_state = RRRRG;
+            	next_ctr5  = ctr5 + 1;
+				next_ctr10 = ctr10 + 1;
+        	end else if (ctr5 > 0 && ctr10 == 0) begin  // ctr5 started --> keep incrementing it
+				next_state = RRRRG;
+				next_ctr5 = ctr5 + 1;
+			end else if(ctr10 == 0 && nb) begin // there is no gap BUT there is traffice waiting on other lights --> begin ctr10
+				next_state = RRRRG;
+				next_ctr10 = ctr10 + 1;
+			end else if(ctr10 > 0 && ctr5 == 0) begin  // ctr10 started --> keep incrementing it 
+				next_state = RRRRG;
+				next_ctr10 = ctr10 + 1;
+			end else if(ctr10 > 0 && ctr5 > 0) begin // if both counters started --> keep incrementing both
+				next_state = RRRRG;
+				next_ctr10 = ctr10 + 1;
+				next_ctr5 = ctr5 + 1;
+			end else begin
+				next_state = RRRRG; // no gap in traffic NOR traffic waiting on other lights --> keep giving green light
+			end
 		end
 		RRRRY: next_state = RRRRZ;
 		RRRRZ: next_state = RRRRH;
 		RRRRH: begin
 			// EWS > EL_ES > WL_WS > EWL > NS 
 			// finish priority doctrine
-			if() begin
+			if(s) begin
 				next_state = GRRRR;  
-			end else if() begin
+			end else if(e) begin
 				next_state = RGRRR;  
-			end else if() begin
+			end else if(w) begin
 				next_state = RRGRR;  
-			end else if() begin
+			end else if(l) begin
 				next_state = RRRGR;  
-			end else if() begin
+			end else if(n) begin
 				next_state = RRRRG;  
 			end else begin
-				next_state = HRRRR; // stay put
+				next_state = RRRRH; // stay put
 			end 
 		end
 
